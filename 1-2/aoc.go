@@ -59,6 +59,7 @@ func main() {
 			firstDigitIndex = len(line) - 1
 		}
 		beforeFirstDigitSlice := line[:firstDigitIndex]
+		fmt.Println("beforeFirstDigitSlice: ", beforeFirstDigitSlice)
 
 		smallestFirst := 10
 		firstNum := -1
@@ -71,18 +72,26 @@ func main() {
 				}
 			}
 		}
+		fmt.Println("firstNum: ", firstNum)
 		if firstNum != -1 {
-			firstDigit = rune(firstNum)
+			// NOTE: rune is an alias for int32
+			// Each rune can only represent a single byte
+			// So we need to loop through the string to extract the individual runes
+			// But since we're sure that firstNum will always be a string of length 1,
+			// we can just extract the rune with a loop as per below
+			for _, numStr := range strconv.Itoa(firstNum) {
+				firstDigit = numStr
+			}
 		}
-		fmt.Println(firstDigit)
+		fmt.Println("firstDigit: ", firstDigit)
 
 		if lastDigitIndex == -1 {
 			lastDigitIndex = 0
 		}
 		afterLastDigitSlice := line[lastDigitIndex+1:]
-		fmt.Println(afterLastDigitSlice)
+		fmt.Println("afterLastDigitSlice: ", afterLastDigitSlice)
 
-		smallestLast := 10
+		smallestLast := lastDigitIndex + 1
 		lastNum := -1
 		for i, s := range n {
 			if strings.Contains(afterLastDigitSlice, s) {
@@ -93,18 +102,24 @@ func main() {
 				}
 			}
 		}
+		fmt.Println("lastNum: ", lastNum)
 		if lastNum != -1 {
-			lastDigit = rune(lastNum)
+			for _, numStr := range strconv.Itoa(lastNum) {
+				lastDigit = numStr
+			}
 		}
-		fmt.Println(lastDigit)
+		fmt.Println("lastDigit: ", lastDigit)
 
 		var sb strings.Builder
 		sb.WriteRune(firstDigit)
 		sb.WriteRune(lastDigit)
+		fmt.Println("sb: ", sb)
 		str := sb.String()
+		fmt.Println("str: ", str)
 		i, err := strconv.Atoi(str)
 		if err != nil {
 		}
+		fmt.Println("i: ", i)
 		sum += i
 	}
 
