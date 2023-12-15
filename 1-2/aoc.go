@@ -2,26 +2,35 @@ package main
 
 import (
 	"fmt"
+	"os"
 	"strconv"
 	"strings"
 	"unicode"
 )
 
 func main() {
-	// b, err := os.ReadFile("input.txt")
-	// if err != nil {
-	// 	fmt.Print(err)
-	// }
-	// input := string(b)
-	// data := strings.Split(input, "\n")
+	b, err := os.ReadFile("input.txt")
+	if err != nil {
+		fmt.Print(err)
+	}
+	input := string(b)
+	data := strings.Split(input, "\n")
 
-	data := make([]string, 1)
-	data[0] = "one4seveneight"
+	// data := make([]string, 5)
+	// data[0] = "one4seveneight"
+	// data[1] = "ne4eveneght"
+	// data[2] = "oneseveneit"
+	// data[3] = "one4sevenei9ght"
+	// data[4] = "two4seveneight5"
 
 	// Code goes here
 	sum := 0
 
 	for _, line := range data {
+		// break at the last data point
+		if len(line) == 0 {
+			break
+		}
 		firstDigit := '0'
 		lastDigit := '0'
 		firstDigitIndex := -1
@@ -59,7 +68,6 @@ func main() {
 			firstDigitIndex = len(line) - 1
 		}
 		beforeFirstDigitSlice := line[:firstDigitIndex]
-		fmt.Println("beforeFirstDigitSlice: ", beforeFirstDigitSlice)
 
 		smallestFirst := 10
 		firstNum := -1
@@ -72,7 +80,6 @@ func main() {
 				}
 			}
 		}
-		fmt.Println("firstNum: ", firstNum)
 		if firstNum != -1 {
 			// NOTE: rune is an alias for int32
 			// Each rune can only represent a single byte
@@ -83,13 +90,11 @@ func main() {
 				firstDigit = numStr
 			}
 		}
-		fmt.Println("firstDigit: ", firstDigit)
 
 		if lastDigitIndex == -1 {
 			lastDigitIndex = 0
 		}
 		afterLastDigitSlice := line[lastDigitIndex+1:]
-		fmt.Println("afterLastDigitSlice: ", afterLastDigitSlice)
 
 		smallestLast := lastDigitIndex + 1
 		lastNum := -1
@@ -102,25 +107,21 @@ func main() {
 				}
 			}
 		}
-		fmt.Println("lastNum: ", lastNum)
 		if lastNum != -1 {
 			for _, numStr := range strconv.Itoa(lastNum) {
 				lastDigit = numStr
 			}
 		}
-		fmt.Println("lastDigit: ", lastDigit)
 
 		var sb strings.Builder
 		sb.WriteRune(firstDigit)
 		sb.WriteRune(lastDigit)
-		fmt.Println("sb: ", sb)
 		str := sb.String()
-		fmt.Println("str: ", str)
 		i, err := strconv.Atoi(str)
 		if err != nil {
 		}
-		fmt.Println("i: ", i)
 		sum += i
+		// fmt.Println(dataI, ":", sum)
 	}
 
 	fmt.Println(sum)
