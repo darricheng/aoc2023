@@ -52,26 +52,26 @@ func main() {
 			}
 		}
 
-		n := make([]string, 10)
-		n[0] = "zero"
-		n[1] = "one"
-		n[2] = "two"
-		n[3] = "three"
-		n[4] = "four"
-		n[5] = "five"
-		n[6] = "six"
-		n[7] = "seven"
-		n[8] = "eight"
-		n[9] = "nine"
+		numberWords := make([]string, 10)
+		numberWords[0] = "zero"
+		numberWords[1] = "one"
+		numberWords[2] = "two"
+		numberWords[3] = "three"
+		numberWords[4] = "four"
+		numberWords[5] = "five"
+		numberWords[6] = "six"
+		numberWords[7] = "seven"
+		numberWords[8] = "eight"
+		numberWords[9] = "nine"
 
 		if firstDigitIndex == -1 {
 			firstDigitIndex = len(line) - 1
 		}
 		beforeFirstDigitSlice := line[:firstDigitIndex]
 
-		smallestFirst := 10
+		smallestFirst := firstDigitIndex
 		firstNum := -1
-		for i, s := range n {
+		for i, s := range numberWords {
 			if strings.Contains(beforeFirstDigitSlice, s) {
 				index := strings.Index(beforeFirstDigitSlice, s)
 				if index < smallestFirst {
@@ -91,16 +91,13 @@ func main() {
 			}
 		}
 
-		if lastDigitIndex == -1 {
-			lastDigitIndex = 0
-		}
 		afterLastDigitSlice := line[lastDigitIndex+1:]
 
-		smallestLast := lastDigitIndex + 1
+		smallestLast := -1
 		lastNum := -1
-		for i, s := range n {
+		for i, s := range numberWords {
 			if strings.Contains(afterLastDigitSlice, s) {
-				index := strings.Index(afterLastDigitSlice, s)
+				index := strings.LastIndex(afterLastDigitSlice, s)
 				if index > smallestLast {
 					smallestLast = index
 					lastNum = i
@@ -121,7 +118,10 @@ func main() {
 		if err != nil {
 		}
 		sum += i
-		// fmt.Println(dataI, ":", sum)
+
+		println(line)
+		println("i:", i)
+		println("current sum:", sum)
 	}
 
 	fmt.Println(sum)
