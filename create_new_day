@@ -2,4 +2,5 @@
 
 mkdir day$1
 touch day$1/data.txt
-./add_new_part $1 1
+mkdir day$1\/$1\-1
+cp ./templates/*go* day$1\/$1\-1

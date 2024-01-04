@@ -1,4 +1,0 @@
-#!/bin/bash
-
-mkdir day$1\/$1\-$2
-cp ./templates/*go* day$1\/$1\-$2
