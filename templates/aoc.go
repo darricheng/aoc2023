@@ -14,5 +14,9 @@ func main() {
 	input := string(b)
 	data := strings.Split(input, "\n")
 
-	// Code goes here
+	for i, line := range data {
+		fmt.Println("line", i, "--", line)
+		// Code goes here
+
+	}
 }
