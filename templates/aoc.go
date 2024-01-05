@@ -9,11 +9,13 @@ import (
 func main() {
 	b, err := os.ReadFile("../data.txt")
 	if err != nil {
-		fmt.Print(err)
+		panic(err)
 	}
 	input := string(b)
 	data := strings.Split(input, "\n")
 	numOfLines := len(data)
+
+	res := 0
 
 	for i, line := range data {
 		if i == numOfLines-1 {
@@ -24,4 +26,6 @@ func main() {
 		// Code goes here
 
 	}
+
+	fmt.Printf("FINAL RESULT: %d\n", res)
 }
