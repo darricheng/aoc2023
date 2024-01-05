@@ -24,10 +24,6 @@ Algorithm
 
 var data []string
 
-func isNum(row int, col int) bool {
-	return unicode.IsDigit(rune(data[row][col]))
-}
-
 func main() {
 	b, err := os.ReadFile("../data.txt")
 	if err != nil {
@@ -77,6 +73,11 @@ func main() {
 		}
 	}
 	fmt.Println("FINAL RESULT:", res)
+}
+
+func isNum(row int, col int) bool {
+	_, err := strconv.Atoi(string(rune(data[row][col])))
+	return err == nil
 }
 
 func getAdjRowNum(row int, col int) []int {
@@ -146,8 +147,13 @@ func getAdjRowNum(row int, col int) []int {
 			res = append(res, getBackwardsNum(row, col))
 		// 111
 		case 0b_111:
-			backPart := strconv.Itoa(getBackwardsNum(row, col-1))
-			frontPart := strconv.Itoa(getForwardsNum(row, col))
+			backPart := strconv.Itoa(getBackwardsNum(row, col))
+			/*
+				The below line only works because there are no numbers larger than 3 digits
+				If there are numbers found by the below function that starts with 0, the returned result will be less a 0 in the middle of the number
+				A fix could involve changing the getForwardsNum to return a string, then parse the string in the calling function
+			*/
+			frontPart := strconv.Itoa(getForwardsNum(row, col+1))
 			fullNum, err := strconv.Atoi(backPart + frontPart)
 			if err != nil {
 				panic(err)
