@@ -8,20 +8,20 @@ import (
 	"strings"
 )
 
-type numMap struct {
+type mapNums struct {
 	destStart   int
 	sourceStart int
 	rangeLen    int
 }
 
 var seeds []int
-var seedToSoil []numMap
-var soilToFertilizer []numMap
-var fertilizerToWater []numMap
-var waterToLight []numMap
-var lightToTemp []numMap
-var tempToHumidity []numMap
-var humidityToLocation []numMap
+var seedToSoil []mapNums
+var soilToFertilizer []mapNums
+var fertilizerToWater []mapNums
+var waterToLight []mapNums
+var lightToTemp []mapNums
+var tempToHumidity []mapNums
+var humidityToLocation []mapNums
 
 func main() {
 	b, err := os.ReadFile("../data.txt")
@@ -35,14 +35,14 @@ func main() {
 	res := math.MaxInt
 	categoryCounter := 0
 	intraCounter := 0
-	var currentMap *[]numMap
+	var currentMap *[]mapNums
 
 	// parse data into respective vars
 	for i, line := range data {
 		if i == numOfLines-1 {
 			break
 		}
-		fmt.Println("line", i, "--", line)
+		// fmt.Println("line", i, "--", line)
 
 		switch categoryCounter {
 		case 0: // seeds
@@ -98,7 +98,7 @@ func main() {
 			if err != nil {
 				panic(err)
 			}
-			newMap := numMap{
+			newMap := mapNums{
 				dest,
 				source,
 				rangeL,
@@ -107,5 +107,33 @@ func main() {
 		}
 	}
 
+	// find the location for each seed
+	for _, seedNum := range seeds {
+		fmt.Printf("Processing seed: %d\n", seedNum)
+		soilNum := process(seedNum, seedToSoil)
+		fertilizerNum := process(soilNum, soilToFertilizer)
+		waterNum := process(fertilizerNum, fertilizerToWater)
+		lightNum := process(waterNum, waterToLight)
+		tempNum := process(lightNum, lightToTemp)
+		humidityNum := process(tempNum, tempToHumidity)
+		locationNum := process(humidityNum, humidityToLocation)
+
+		if locationNum < res {
+			res = locationNum
+		}
+	}
+
 	fmt.Printf("FINAL RESULT: %d\n", res)
+}
+
+// based on the provided map m, returns the correct destination number for the provided n
+func process(n int, maps []mapNums) int {
+	for _, m := range maps {
+		start := m.sourceStart
+		end := m.sourceStart + m.rangeLen - 1
+		if n >= start && n <= end {
+			return n - start + m.destStart
+		}
+	}
+	return n
 }
