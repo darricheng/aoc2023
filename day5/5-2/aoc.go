@@ -176,6 +176,85 @@ func process(n [][2]int, maps []mapNums) [][2]int {
 		The list of ranges will be treated as a queue, as in case 6,
 		we enqueue another pair to check later
 	*/
+	var transformedRanges [][2]int
+
+	for {
+		// Keep iterating until all range pairs are removed from the queue
+		if len(n) == 0 {
+			break
+		}
+		// Dequeue the first range pair
+		rangePair := n[0]
+		n = n[1:]
+
+		// loop through the maps to compare against the pair
+		for _, mapPair := range maps {
+			// check which case 1-6 it is
+			var caseId int
+			rangeStart := rangePair[0]
+			rangeEnd := rangeStart + rangePair[1] - 1 // -1 to count for the rangeStart
+			mapStart := mapPair.sourceStart
+			mapEnd := mapStart + mapPair.rangeLen - 1
+
+			if rangeStart < mapStart { // 1,3,6
+				if rangeEnd < mapStart {
+					caseId = 1
+				} else if rangeEnd <= mapEnd {
+					caseId = 3
+				} else {
+					caseId = 6
+				}
+			} else { // 2,4,5
+				if rangeStart > mapEnd {
+					caseId = 2
+				} else if rangeEnd <= mapEnd {
+					caseId = 5
+				} else {
+					caseId = 4
+				}
+			}
+
+			leftoverStart := rangeStart
+			leftoverEnd := rangeEnd
+			switch caseId {
+			case 1: // do nothing
+			case 2: // do nothing
+			case 3:
+				leftoverEnd = mapStart - 1
+				transformedLen := rangeEnd - leftoverEnd
+				transformedRange := [2]int{mapPair.destStart, transformedLen}
+				transformedRanges = append(transformedRanges, transformedRange)
+			case 4:
+				leftoverStart = mapEnd + 1
+				transformedLen := leftoverStart - rangeStart
+				transformedStart := rangeStart - mapStart + mapPair.destStart
+				transformedRange := [2]int{transformedStart, transformedLen}
+				transformedRanges = append(transformedRanges, transformedRange)
+			case 5:
+				transformedStart := rangeStart - mapStart + mapPair.destStart
+				transformedRange := [2]int{transformedStart, rangePair[1]}
+				transformedRanges = append(transformedRanges, transformedRange)
+				// break out of loop as we're done with this range
+				break
+			case 6:
+				leftoverEnd = mapStart - 1
+				transformedRange := [2]int{mapPair.destStart, mapPair.rangeLen}
+				transformedRanges = append(transformedRanges, transformedRange)
+				// append leftover on right side to queue
+				extraStart := mapEnd + 1
+				extraLen := rangeEnd - mapEnd
+				extra := [2]int{extraStart, extraLen}
+				n = append(n, extra)
+			}
+			rangePair[0] = leftoverStart
+			rangePair[1] = leftoverEnd - leftoverStart + 1 // +1 to include the start value
+		}
+		// finished checking through all the maps for the current range pair
+		// Add the leftover range to the transformed ranges slice
+		transformedRanges = append(transformedRanges, rangePair)
+	}
+	// done with checking all the range pairs
+	// TODO: I think I'm done with the split and transform implementation, need to test
 
 	/*
 		# Sort and merge
