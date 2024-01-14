@@ -1,9 +1,10 @@
 package main
 
 import (
+	"cmp"
 	"fmt"
-	"math"
 	"os"
+	"slices"
 	"strconv"
 	"strings"
 )
@@ -40,7 +41,7 @@ func main() {
 	data := strings.Split(input, "\n")
 	numOfLines := len(data)
 
-	res := math.MaxInt
+	// res := math.MaxInt
 	categoryCounter := 0
 	intraCounter := 0
 	var currentMap *[]mapNums
@@ -122,15 +123,22 @@ func main() {
 		}
 	}
 
+	fmt.Println("------------- seed to soil -------------")
 	soilRanges := process(seedRanges, seedToSoil)
+	fmt.Println("------------- soil to fertilizer -------------")
 	fertilizerRanges := process(soilRanges, soilToFertilizer)
+	fmt.Println("------------- fertilizer to water -------------")
 	waterRanges := process(fertilizerRanges, fertilizerToWater)
+	fmt.Println("------------- water to light -------------")
 	lightRanges := process(waterRanges, waterToLight)
+	fmt.Println("------------- light to temp -------------")
 	tempRanges := process(lightRanges, lightToTemp)
+	fmt.Println("------------- temp to humidity -------------")
 	humidityRanges := process(tempRanges, tempToHumidity)
+	fmt.Println("------------- humidity to location -------------")
 	locationRanges := process(humidityRanges, humidityToLocation)
 
-	fmt.Printf("FINAL RESULT: %d\n", res)
+	fmt.Printf("FINAL RESULT: %d\n", locationRanges[0][0])
 }
 
 // based on the provided map m, returns the correct destination number for the provided n
@@ -176,6 +184,7 @@ func process(n [][2]int, maps []mapNums) [][2]int {
 		The list of ranges will be treated as a queue, as in case 6,
 		we enqueue another pair to check later
 	*/
+	fmt.Println("--- Split and transform ---")
 	var transformedRanges [][2]int
 
 	for {
@@ -186,9 +195,16 @@ func process(n [][2]int, maps []mapNums) [][2]int {
 		// Dequeue the first range pair
 		rangePair := n[0]
 		n = n[1:]
+		fmt.Println("current range pair:", rangePair)
+
+		// flag to check if we should add the leftover range after checking all the maps
+		// will only be flipped if we encounter case 5
+		noLeftOverRange := false
 
 		// loop through the maps to compare against the pair
+	mapsLoop:
 		for _, mapPair := range maps {
+			fmt.Printf("check against map [source, len, dest]: [%d, %d, %d]\n", mapPair.sourceStart, mapPair.rangeLen, mapPair.destStart)
 			// check which case 1-6 it is
 			var caseId int
 			rangeStart := rangePair[0]
@@ -213,6 +229,7 @@ func process(n [][2]int, maps []mapNums) [][2]int {
 					caseId = 4
 				}
 			}
+			fmt.Println("caseId:", caseId)
 
 			leftoverStart := rangeStart
 			leftoverEnd := rangeEnd
@@ -235,7 +252,9 @@ func process(n [][2]int, maps []mapNums) [][2]int {
 				transformedRange := [2]int{transformedStart, rangePair[1]}
 				transformedRanges = append(transformedRanges, transformedRange)
 				// break out of loop as we're done with this range
-				break
+				fmt.Println("case 5, breaking out of loop")
+				noLeftOverRange = true
+				break mapsLoop
 			case 6:
 				leftoverEnd = mapStart - 1
 				transformedRange := [2]int{mapPair.destStart, mapPair.rangeLen}
@@ -248,13 +267,19 @@ func process(n [][2]int, maps []mapNums) [][2]int {
 			}
 			rangePair[0] = leftoverStart
 			rangePair[1] = leftoverEnd - leftoverStart + 1 // +1 to include the start value
+			fmt.Println("leftover range:", rangePair)
+			fmt.Println("transformedRanges:", transformedRanges)
 		}
 		// finished checking through all the maps for the current range pair
-		// Add the leftover range to the transformed ranges slice
-		transformedRanges = append(transformedRanges, rangePair)
+		if !noLeftOverRange {
+			// Add the leftover range to the transformed ranges slice
+			fmt.Println("adding leftover range")
+			transformedRanges = append(transformedRanges, rangePair)
+			fmt.Println("transformed ranges", transformedRanges)
+		}
 	}
 	// done with checking all the range pairs
-	// TODO: I think I'm done with the split and transform implementation, need to test
+	fmt.Println("UNSORTED transformed ranges", transformedRanges)
 
 	/*
 		# Sort and merge
@@ -263,6 +288,12 @@ func process(n [][2]int, maps []mapNums) [][2]int {
 		are `[start, range]`.
 		However, there might be some ranges that overlap(?), so we sort the ranges by their start,
 		then merge any overlapping ranges together.
+		NOTE: No merging was required to get the correct final answer
 	*/
-
+	fmt.Println("--- Sort and merge ---")
+	slices.SortFunc(transformedRanges, func(a, b [2]int) int {
+		return cmp.Compare(a[0], b[0])
+	})
+	fmt.Println("FINAL SORTED transformed ranges", transformedRanges)
+	return transformedRanges
 }
